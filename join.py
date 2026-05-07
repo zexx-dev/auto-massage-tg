@@ -1,0 +1,54 @@
+from pyrogram import Client
+from pyrogram.types import ChatJoinRequest
+import json
+
+DB_FILE = "database.json"
+
+def load_db():
+    with open(DB_FILE, "r") as f:
+        return json.load(f)
+
+@Client.on_chat_join_request()
+async def auto_accept(client, join_request):
+
+    user_id = join_request.from_user.id
+
+    # Auto Approve
+    await join_request.approve()
+
+    data = load_db()
+
+    try:
+
+        # Send Text
+        if data["text"]:
+            await client.send_message(
+                user_id,
+                data["text"]
+            )
+
+        # Send Photo
+        if data["photo"]:
+            await client.send_photo(
+                user_id,
+                data["photo"]
+            )
+
+        # Send Video
+        if data["video"]:
+            await client.send_video(
+                user_id,
+                data["video"]
+            )
+
+        # Send APK
+        if data["apk"]:
+            await client.send_document(
+                user_id,
+                data["apk"]
+            )
+
+        print(f"Sent Successfully To {user_id}")
+
+    except Exception as e:
+        print(e)
